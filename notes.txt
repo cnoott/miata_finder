@@ -1,0 +1,16 @@
+targets:
+    - cragislist (houston, austin, waco, etc)
+    - ebay
+    - facebook market
+
+
+search words: miata (keep it simple for now)
+
+Target_1: craigslist
+    IMPORTANT: to switch between cities change the sub domain.
+
+
+   url to parse: 
+   https://houston.craigslist.org/search/cta?query=miata
+
+   
