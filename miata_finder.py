@@ -3,32 +3,38 @@
 from bs4 import BeautifulSoup
 import requests
 from cache import cache_list
+import os
 
 
 class Miata:
-    def __init__(self, name, pid, price):
+    def __init__(self, name, pid, price, city):
         self.name = name
         self.pid = pid
         self.price = price
+        self.city = city
 
 
 
-def craigslistSearch(city):
+def craigslistSearch():
     '''
     parses craigslist miata serach and returns miata object list
     '''
-    url = requests.get("https://{}.craigslist.org/search/cta?query=miata".format(city))
-    url = url.text
-    soup = BeautifulSoup(url, "html.parser")
-
-    miata_prices = soup.find_all("span", {"class": "result-price"})
-    miata_namesandpid = soup.find_all("a",{"class": "result-title hdrlnk"})
+    cities = ["houston","austin","dallas","waco"]
     miata_list = [] #holds miata objects
-    for price, npid in zip(miata_prices[::2], miata_namesandpid):
-        if "miata" not in npid.text.lower():
-            continue
-        else:
-            miata_list.append(Miata(npid.text, npid.get("data-id"), price.text))
+    for city in cities:
+        url = requests.get("https://{}.craigslist.org/search/cta?query=miata".format(city))
+        url = url.text
+        soup = BeautifulSoup(url, "html.parser")
+
+        miata_prices = soup.find_all("span", {"class": "result-price"})
+        miata_namesandpid = soup.find_all("a",{"class": "result-title hdrlnk"})
+        for price, npid in zip(miata_prices[::2], miata_namesandpid):
+            if "miata" not in npid.text.lower():
+                continue
+            elif npid.get("data-id") in miata_list:
+                continue
+            else:
+                miata_list.append(Miata(npid.text, npid.get("data-id"), price.text,city))
     return miata_list
 
 
@@ -42,24 +48,23 @@ def c_updateCache(miata_list):
         cacheFile.write("{},".format(miatas.pid))
     cacheFile.write("]")
 
-def c_checkCache(city):
+def c_checkCache():
     '''
     parses craigslist miata search and compares it to cache to find changes returns a list of miata objects
     '''
     not_in = []
-    current_pids = craigslistSearch(city)
+    current_pids = craigslistSearch()
     for pids in current_pids:
         if str(pids.pid) not in str(cache_list):
             not_in.append(pids)
+            os.system('echo "{} \nPrice:{}" | mail -s "New Miata Listing!" liamamadio@gmail.com'.format(pids.name,pids.price))
+            print(pids.name)
     return not_in
 
 #testing
-not_in = c_checkCache("houston")
-for nots in not_in:
-    print(nots)
 
-
-
-
-
+def main():
+    not_in = c_checkCache()
+    c_updateCache(craigslistSearch())
+main()
 
