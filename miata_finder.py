@@ -57,8 +57,9 @@ def c_checkCache():
     for pids in current_pids:
         if str(pids.pid) not in str(cache_list):
             not_in.append(pids)
-            os.system('echo "{} \nPrice:{}" | mail -s "New Miata Listing!" liamamadio@gmail.com'.format(pids.name,pids.price))
-            print(pids.name)
+            emailString = "{}\nPrice:{}".format(pids.name,pids.price)
+            os.system('echo "{}" | mail -s "New Miata Listing!" liamamadio@gmail.com'.format(emailString))
+            print(pids.name,":",pids.price)
     return not_in
 
 #testing
