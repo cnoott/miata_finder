@@ -31,7 +31,7 @@ def craigslistSearch():
         for price, npid in zip(miata_prices[::2], miata_namesandpid):
             if "miata" not in npid.text.lower():
                 continue
-            elif npid.get("data-id") in miata_list:
+            elif npid in miata_list:
                 continue
             else:
                 miata_list.append(Miata(npid.text, npid.get("data-id"), price.text,city))
@@ -57,7 +57,7 @@ def c_checkCache():
     for pids in current_pids:
         if str(pids.pid) not in str(cache_list):
             not_in.append(pids)
-            emailString = "{}\nPrice:{}".format(pids.name,pids.price)
+            emailString = "{}\nPrice:\{}\nLocation:{}".format(pids.name,pids.price,pids.city)
             os.system('echo "{}" | mail -s "New Miata Listing!" liamamadio@gmail.com'.format(emailString))
             print(pids.name,":",pids.price)
     return not_in
