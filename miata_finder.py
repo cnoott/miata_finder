@@ -45,7 +45,7 @@ def craigslistSearch():
             elif npid in miata_list:
                 continue
             else:
-                miata_list.append(Miata(npid.text, npid.get("data-id"), price.text,city))
+                miata_list.append(Miata(npid.text, npid.get("data-id"), price.text,city,npid.get("href")))
 
 
     miata_list = filterDuplicates(miata_list)
@@ -99,9 +99,8 @@ def c_checkCache():
 
 def main():
 
-    miata_list = craigslistSearch()
+    craigslistSearch()
     not_in = c_checkCache()
-
     emailNewMiatas(not_in)
 
     c_updateCache(craigslistSearch())
